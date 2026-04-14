@@ -1,0 +1,84 @@
+# ==============================
+# Node.js / Backend / Relayer / Indexer
+# ==============================
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.env
+.env.*
+!.env.example
+
+dist/
+build/
+coverage/
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Hardhat / Blockchain
+# ==============================
+
+artifacts/
+cache/
+typechain/
+typechain-types/
+
+# Deployment secrets
+secrets.json
+
+# ==============================
+# Flutter / Dart
+# ==============================
+
+# Flutter build outputs
+build/
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# iOS
+ios/Pods/
+ios/Runner.xcworkspace/
+
+# Android
+android/.gradle/
+android/app/build/
+
+# Generated files
+*.lock
+
+# ==============================
+# IDE / Editor
+# ==============================
+
+.vscode/
+.idea/
+*.iml
+
+# ==============================
+# Docker
+# ==============================
+
+docker-compose.override.yml
+
+# ==============================
+# Misc
+# ==============================
+
+*.tmp
+*.temp
+*.swp
+*.swo

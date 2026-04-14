@@ -1,0 +1,64 @@
+
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: zk-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: zkrollup
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  hardhat:
+    image: node:18
+    container_name: zk-hardhat
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: npx hardhat node
+    ports:
+      - "8545:8545"
+
+  backend:
+    image: node:18
+    container_name: zk-backend
+    working_dir: /app/backend
+    volumes:
+      - ./backend:/app/backend
+    command: sh -c "npm install && node src/server.js"
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+      - hardhat
+
+  relayer:
+    image: node:18
+    container_name: zk-relayer
+    working_dir: /app/relayer
+    volumes:
+      - ./relayer:/app/relayer
+    command: sh -c "npm install && node relayer.js"
+    depends_on:
+      - backend
+      - hardhat
+
+  indexer:
+    image: node:18
+    container_name: zk-indexer
+    working_dir: /app/indexer
+    volumes:
+      - ./indexer:/app/indexer
+    command: sh -c "npm install && node indexer.js"
+    depends_on:
+      - backend
+      - hardhat
+
+volumes:
+  postgres_data:
