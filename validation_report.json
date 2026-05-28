@@ -1,0 +1,36 @@
+{
+  "passed": 3,
+  "failed": 3,
+  "results": [
+    {
+      "test": "Deposit ETH On-Chain",
+      "status": "pass",
+      "detail": "Deposited 0.5 ETH, tx: 0xbeddb6038e5265057e0c37f255486976ef836d376aa4867a91f2d5a5c8514352"
+    },
+    {
+      "test": "Indexer Deposit Sync",
+      "status": "pass",
+      "detail": "Deposit balance tracked successfully: 1.0 ETH (1000000000000000000 wei)"
+    },
+    {
+      "test": "Submit Valid Intent",
+      "status": "fail",
+      "detail": "Failed: Status code 400"
+    },
+    {
+      "test": "Submit Invalid Intent",
+      "status": "fail",
+      "detail": "Asserted status 400 and error message: status=400, error=\"Invalid Ethereum address\""
+    },
+    {
+      "test": "Relayer Batch Processing",
+      "status": "fail",
+      "detail": "Batch count did not increase. Last state: {\"currentStateRoot\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"batchCount\":0,\"contractAddress\":\"0x7969c5eD335650692Bc04293B07F5BF2e7A673C0\"}"
+    },
+    {
+      "test": "Verify Batches List",
+      "status": "pass",
+      "detail": "Found 2 committed batches via API"
+    }
+  ]
+}

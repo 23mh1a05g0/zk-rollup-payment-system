@@ -24,7 +24,7 @@ async function main() {
   const data = {
     network: "localhost",
     chainId: 31337,
-    rpcUrl: "http://127.0.0.1:8545",
+    rpcUrl: "http://hardhat:8545",
     ZKRollupPayments: rollup.address,
     StubZKVerifier: verifier.address,
     deployedAt: new Date().toISOString(),

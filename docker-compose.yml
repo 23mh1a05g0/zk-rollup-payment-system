@@ -1,9 +1,8 @@
-
+version: '3.8'
 
 services:
-
   postgres:
-    image: postgres:15
+    image: postgres:15-alpine
     container_name: zk-postgres
     restart: always
     environment:
@@ -11,54 +10,74 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: zkrollup
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   hardhat:
-    image: node:18
+    image: node:18-alpine
     container_name: zk-hardhat
     working_dir: /app
     volumes:
       - .:/app
-    command: npx hardhat node
+    command: sh -c "npm install && npx hardhat node"
     ports:
       - "8545:8545"
 
-  backend:
-    image: node:18
-    container_name: zk-backend
-    working_dir: /app/backend
+  deployer:
+    image: node:18-alpine
+    container_name: zk-deployer
+    working_dir: /app
     volumes:
-      - ./backend:/app/backend
-    command: sh -c "npm install && node src/server.js"
+      - .:/app
+    depends_on:
+      - hardhat
+    environment:
+      - RPC_URL=http://hardhat:8545
+    command: sh -c "node -e 'const http = require(\"http\"); const wait = () => http.get(\"http://hardhat:8545\", (res) => process.exit(0)).on(\"error\", () => setTimeout(wait, 500)); wait();' && npx hardhat run scripts/deploy.js --network localhost"
+
+  backend:
+    build: ./backend
+    container_name: zk-backend
     ports:
       - "4000:4000"
-    depends_on:
-      - postgres
-      - hardhat
-
-  relayer:
-    image: node:18
-    container_name: zk-relayer
-    working_dir: /app/relayer
     volumes:
-      - ./relayer:/app/relayer
-    command: sh -c "npm install && node relayer.js"
+      - ./deployments:/usr/src/deployments
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=zkrollup
+      - API_PORT=4000
+      - RPC_URL=http://hardhat:8545
+      - RELAYER_PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
     depends_on:
-      - backend
-      - hardhat
+      postgres:
+        condition: service_healthy
+      deployer:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "node -e 'const http = require(\"http\"); http.get(\"http://localhost:4000/\", (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on(\"error\", () => process.exit(1));'"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  indexer:
-    image: node:18
-    container_name: zk-indexer
-    working_dir: /app/indexer
-    volumes:
-      - ./indexer:/app/indexer
-    command: sh -c "npm install && node indexer.js"
+  flutter:
+    build: ./flutter_app
+    container_name: zk-flutter
+    ports:
+      - "8080:8080"
     depends_on:
-      - backend
-      - hardhat
+      backend:
+        condition: service_healthy
 
 volumes:
   postgres_data:

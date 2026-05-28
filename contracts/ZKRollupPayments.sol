@@ -96,15 +96,15 @@ contract ZKRollupPayments is Ownable {
 
     // ---------------- ADMIN FUNCTIONS ----------------
 
-    function addRelayer(address relayerAddr) external onlyOwner {
-        relayers[relayerAddr] = true;
+    function addRelayer(address relayer) external onlyOwner {
+        relayers[relayer] = true;
     }
 
-    function removeRelayer(address relayerAddr) external onlyOwner {
-        relayers[relayerAddr] = false;
+    function removeRelayer(address relayer) external onlyOwner {
+        relayers[relayer] = false;
     }
 
-    function isRelayer(address relayerAddr) external view returns (bool) {
-        return relayers[relayerAddr];
+    function isRelayer(address relayer) external view returns (bool) {
+        return relayers[relayer];
     }
 }
